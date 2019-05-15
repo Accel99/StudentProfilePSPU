@@ -4,6 +4,9 @@
     tools:showIn="navigation_view">
     <group android:checkableBehavior="single" >
         <item
+            android:id="@+id/amdHome"
+            android:title="@string/activity_main_drawer_home" />
+        <item
             android:id="@+id/amdCurriculum"
             android:title="@string/activity_main_drawer_curriculum" />
         <item
