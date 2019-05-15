@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single" >
+        <item
+            android:id="@+id/amdCurriculum"
+            android:title="@string/activity_main_drawer_curriculum" />
+        <item
+            android:id="@+id/amdSchedule"
+            android:title="@string/activity_main_drawer_schedule" />
+        <item
+            android:id="@+id/amdGrades"
+            android:title="@string/activity_main_drawer_grades" />
+        <item
+            android:id="@+id/amdPaymentInfo"
+            android:title="@string/activity_main_drawer_payment_information" />
+        <item
+            android:id="@+id/amdOrderingCertificates"
+            android:title="@string/activity_main_drawer_ordering_certificates" />
+        <item
+            android:id="@+id/amdExit"
+            android:title="@string/activity_main_drawer_exit" />
+    </group>
+</menu>
