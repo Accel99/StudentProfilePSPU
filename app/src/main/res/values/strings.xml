@@ -23,4 +23,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="btnSession">Сессии</string>
     <string name="btnSemesters">Семестры</string>
+    <string name="updPdf">Обновить</string>
+    <string name="nav_header_main_group">Группа</string>
+    <string name="nav_header_main_faculty">Факультет</string>
 </resources>
