@@ -27,8 +27,7 @@ public class GradesFragment extends Fragment implements View.OnClickListener {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((MainActivity)getActivity()).setActionBarTitle(getResources().getString(R.string.activity_main_drawer_grades));
 
         View v = inflater.inflate(R.layout.fragment_grades, container, false);

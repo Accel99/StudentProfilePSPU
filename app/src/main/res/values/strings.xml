@@ -26,4 +26,11 @@
     <string name="updPdf">Обновить</string>
     <string name="nav_header_main_group">Группа</string>
     <string name="nav_header_main_faculty">Факультет</string>
+    <string name="activity_main_drawer_hello">Приветствуем в личном кабинете студента ПГГПУ</string>
+    <string name="fOrdering_btnPlace">Справка по месту требования</string>
+    <string name="fOrdering_btnPension">Справка в пенсионный фонд</string>
+    <string name="fOrdering_btnCall">Справка-вызов</string>
+    <string name="fOrdering_tvOrdering">Заказанные справки</string>
+    <string name="fragment_ordering_child_tvCount">Количество экземпляров:</string>
+    <string name="fragment_ordering_child_btnOrder">Заказать</string>
 </resources>

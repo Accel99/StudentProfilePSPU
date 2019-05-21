@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private boolean permissionStatus = false;
 
     private String studentName = "Анпилогов А. А.";
+    private String studentLogin = "1245";
     private String direction = "Фундаментальные информационные технологии";
     private String faculty = "Математический";
     private String group = "111";
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity
     public String getGroup() {
         return group;
     }
+
+    public String getStudentLogin() { return studentLogin; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,11 +134,6 @@ public class MainActivity extends AppCompatActivity
             //Оценки
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.flMain, new GradesFragment());
-            ft.commit();
-        } else if (id == R.id.amdPaymentInfo) {
-            //Информация об оплате
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.flMain, new PaymentInfoFragment());
             ft.commit();
         } else if (id == R.id.amdOrderingCertificates) {
             //Заказ справок

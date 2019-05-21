@@ -20,9 +20,9 @@ public class CurriculumFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((MainActivity)getActivity()).setActionBarTitle(getResources().getString(R.string.activity_main_drawer_curriculum));
+
         return inflater.inflate(R.layout.fragment_curriculum, container, false);
     }
 
