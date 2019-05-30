@@ -30,28 +30,33 @@ public class AuthActivity extends AppCompatActivity {
     Button signOutButton;
 
     /* Azure AD Variables */
-    private PublicClientApplication sampleApp;
+    private static PublicClientApplication sampleApp;
     private IAuthenticationResult authResult;
+
+    public static PublicClientApplication getSampleApp() {
+        return sampleApp;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
+        getSupportActionBar().setTitle("Авторизация");
 
-        callGraphButton = (Button) findViewById(R.id.callGraph);
-        signOutButton = (Button) findViewById(R.id.clearCache);
+//        callGraphButton = (Button) findViewById(R.id.callGraph);
+//        signOutButton = (Button) findViewById(R.id.clearCache);
 
-        callGraphButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                onCallGraphClicked();
-            }
-        });
+//        callGraphButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                onCallGraphClicked();
+//            }
+//        });
 
-        signOutButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                onSignOutClicked();
-            }
-        });
+//        signOutButton.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                onSignOutClicked();
+//            }
+//        });
 
         /* Configure your sample app and save state for this activity */
         sampleApp = new PublicClientApplication(this.getApplicationContext(), R.raw.auth_config);
@@ -65,6 +70,7 @@ public class AuthActivity extends AppCompatActivity {
                     sampleApp.acquireTokenSilentAsync(SCOPES, accounts.get(0), getAuthSilentCallback());
                 } else {
                     /* No accounts */
+                    sampleApp.acquireToken(getActivity(), SCOPES, getAuthInteractiveCallback());
                 }
             }
         });
@@ -72,31 +78,34 @@ public class AuthActivity extends AppCompatActivity {
 
     /* Set the UI for successful token acquisition data */
     private void updateSuccessUI() {
-        callGraphButton.setVisibility(View.INVISIBLE);
-        signOutButton.setVisibility(View.VISIBLE);
-        findViewById(R.id.welcome).setVisibility(View.VISIBLE);
-        ((TextView) findViewById(R.id.welcome)).setText("Welcome, " + authResult.getAccount().getUsername());
-        findViewById(R.id.graphData).setVisibility(View.VISIBLE);
+//        callGraphButton.setVisibility(View.INVISIBLE);
+//        signOutButton.setVisibility(View.VISIBLE);
+//        findViewById(R.id.welcome).setVisibility(View.VISIBLE);
+//        ((TextView) findViewById(R.id.welcome)).setText("Welcome, " + authResult.getAccount().getUsername());
+//        findViewById(R.id.graphData).setVisibility(View.VISIBLE);
+         Intent intent = new Intent(this, MainActivity.class);
+         startActivity(intent);
     }
 
     /* Set the UI for signed out account */
-    private void updateSignedOutUI() {
-        callGraphButton.setVisibility(View.VISIBLE);
-        signOutButton.setVisibility(View.INVISIBLE);
-        findViewById(R.id.welcome).setVisibility(View.INVISIBLE);
-        findViewById(R.id.graphData).setVisibility(View.INVISIBLE);
-        ((TextView) findViewById(R.id.graphData)).setText("No Data");
-
-        Toast.makeText(getBaseContext(), "Signed Out!", Toast.LENGTH_SHORT)
-                .show();
-    }
+//    private void updateSignedOutUI() {
+//        callGraphButton.setVisibility(View.VISIBLE);
+//        signOutButton.setVisibility(View.INVISIBLE);
+//        findViewById(R.id.welcome).setVisibility(View.INVISIBLE);
+//        findViewById(R.id.graphData).setVisibility(View.INVISIBLE);
+//        ((TextView) findViewById(R.id.graphData)).setText("No Data");
+//
+//        Toast.makeText(getBaseContext(), "Signed Out!", Toast.LENGTH_SHORT)
+//                .show();
+//
+//    }
 
     /* Use MSAL to acquireToken for the end-user
      * Callback will call Graph api w/ access token & update UI
      */
-    private void onCallGraphClicked() {
-        sampleApp.acquireToken(getActivity(), SCOPES, getAuthInteractiveCallback());
-    }
+//    private void onCallGraphClicked() {
+//        sampleApp.acquireToken(getActivity(), SCOPES, getAuthInteractiveCallback());
+//    }
 
     public Activity getActivity() {
         return this;
@@ -184,6 +193,7 @@ public class AuthActivity extends AppCompatActivity {
             public void onCancel() {
                 /* User cancelled the authentication */
                 Log.d(TAG, "User cancelled login.");
+                sampleApp.acquireToken(getActivity(), SCOPES, getAuthInteractiveCallback());
             }
         };
     }
@@ -192,38 +202,38 @@ public class AuthActivity extends AppCompatActivity {
      * Logically similar to "sign out" but only signs out of this app.
      * User will get interactive SSO if trying to sign back-in.
      */
-    private void onSignOutClicked() {
-        /* Attempt to get a user and acquireTokenSilent
-         * If this fails we do an interactive request
-         */
-        sampleApp.getAccounts(new PublicClientApplication.AccountsLoadedCallback() {
-            @Override
-            public void onAccountsLoaded(final List<IAccount> accounts) {
-
-                if (accounts.isEmpty()) {
-                    /* No accounts to remove */
-
-                } else {
-                    for (final IAccount account : accounts) {
-                        sampleApp.removeAccount(
-                                account,
-                                new PublicClientApplication.AccountsRemovedCallback() {
-                                    @Override
-                                    public void onAccountsRemoved(Boolean isSuccess) {
-                                        if (isSuccess) {
-                                            /* successfully removed account */
-                                        } else {
-                                            /* failed to remove account */
-                                        }
-                                    }
-                                });
-                    }
-                }
-
-                updateSignedOutUI();
-            }
-        });
-    }
+//    private void onSignOutClicked() {
+//        /* Attempt to get a user and acquireTokenSilent
+//         * If this fails we do an interactive request
+//         */
+//        sampleApp.getAccounts(new PublicClientApplication.AccountsLoadedCallback() {
+//            @Override
+//            public void onAccountsLoaded(final List<IAccount> accounts) {
+//
+//                if (accounts.isEmpty()) {
+//                    /* No accounts to remove */
+//
+//                } else {
+//                    for (final IAccount account : accounts) {
+//                        sampleApp.removeAccount(
+//                                account,
+//                                new PublicClientApplication.AccountsRemovedCallback() {
+//                                    @Override
+//                                    public void onAccountsRemoved(Boolean isSuccess) {
+//                                        if (isSuccess) {
+//                                            /* successfully removed account */
+//                                        } else {
+//                                            /* failed to remove account */
+//                                        }
+//                                    }
+//                                });
+//                    }
+//                }
+//
+//                updateSignedOutUI();
+//            }
+//        });
+//    }
 
     /* Use Volley to make an HTTP request to the /me endpoint from MS Graph using an access token */
     private void callGraphAPI() {
@@ -247,7 +257,7 @@ public class AuthActivity extends AppCompatActivity {
                 /* Successfully called graph, process data and send to UI */
                 Log.d(TAG, "Response: " + response.toString());
 
-                updateGraphUI(response);
+                //updateGraphUI(response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -273,8 +283,8 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     /* Sets the graph response */
-    private void updateGraphUI(JSONObject graphResponse) {
-        TextView graphText = findViewById(R.id.graphData);
-        graphText.setText(graphResponse.toString());
-    }
+//    private void updateGraphUI(JSONObject graphResponse) {
+//        TextView graphText = findViewById(R.id.graphData);
+//        graphText.setText(graphResponse.toString());
+//    }
 }

@@ -1,6 +1,7 @@
 package com.example.profile;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,11 @@ import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.microsoft.identity.client.IAccount;
+import com.microsoft.identity.client.PublicClientApplication;
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -29,6 +35,8 @@ public class MainActivity extends AppCompatActivity
     private String direction = "Фундаментальные информационные технологии";
     private String faculty = "Математический";
     private String group = "111";
+
+    PublicClientApplication sampleApp;
 
     public String getFaculty() { return faculty; }
 
@@ -71,6 +79,8 @@ public class MainActivity extends AppCompatActivity
         ft.replace(R.id.flMain, new HomeFragment());
         ft.commit();
         navigationView.setCheckedItem(R.id.amdHome);
+
+        sampleApp = AuthActivity.getSampleApp();
     }
 
     //Установка заголовка фрагментов
@@ -120,7 +130,7 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.flMain, new OrderingCertificatesFragment());
             ft.commit();
         } else if (id == R.id.amdExit) {
-
+            onExitClicked();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -156,4 +166,45 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /* Clears an account's tokens from the cache.
+     * Logically similar to "sign out" but only signs out of this app.
+     * User will get interactive SSO if trying to sign back-in.
+     */
+    private void onExitClicked() {
+        /* Attempt to get a user and acquireTokenSilent
+         * If this fails we do an interactive request
+         */
+        sampleApp.getAccounts(new PublicClientApplication.AccountsLoadedCallback() {
+            @Override
+            public void onAccountsLoaded(final List<IAccount> accounts) {
+
+                if (accounts.isEmpty()) {
+                    /* No accounts to remove */
+
+                } else {
+                    for (final IAccount account : accounts) {
+                        sampleApp.removeAccount(
+                                account,
+                                new PublicClientApplication.AccountsRemovedCallback() {
+                                    @Override
+                                    public void onAccountsRemoved(Boolean isSuccess) {
+                                        if (isSuccess) {
+                                            /* successfully removed account */
+                                        } else {
+                                            /* failed to remove account */
+                                        }
+                                    }
+                                });
+                    }
+                }
+
+                updateExitUI();
+            }
+        });
+    }
+
+    private void updateExitUI() {
+        Intent intent = new Intent(this, AuthActivity.class);
+        startActivity(intent);
+    }
 }
