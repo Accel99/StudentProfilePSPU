@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.MyAdapter;
+import com.example.Ordering;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,6 +28,8 @@ import java.util.List;
 public class OrderingCertificatesFragment extends Fragment implements View.OnClickListener {
 
     ListView listView;
+    List<Ordering> list = new ArrayList<>();
+    long studentId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
         Button btnPlace = v.findViewById(R.id.btnPlace);
         Button btnPension = v.findViewById(R.id.btnPension);
         Button btnCall = v.findViewById(R.id.btnCall);
+
+        studentId = ((MainActivity)getActivity()).getStudentId();
 
         btnPlace.setOnClickListener(this);
         btnPension.setOnClickListener(this);
@@ -57,17 +62,17 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
         OrderingChildFragment fragment = new OrderingChildFragment();
         Bundle bundle = new Bundle();
         if (id == R.id.btnPlace) {
-            bundle.putInt("type", 1);
+            bundle.putInt("type", 2);
             fragment.setArguments(bundle);
             ft.replace(R.id.flOrderingPlace, fragment);
             ft.commit();
         } else if (id == R.id.btnPension) {
-            bundle.putInt("type", 0);
+            bundle.putInt("type", 1);
             fragment.setArguments(bundle);
             ft.replace(R.id.flOrderingPension, fragment);
             ft.commit();
         } else if (id == R.id.btnCall) {
-            bundle.putInt("type", 2);
+            bundle.putInt("type", 3);
             fragment.setArguments(bundle);
             ft.replace(R.id.flOrderingCall, fragment);
             ft.commit();
@@ -75,40 +80,21 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
     }
 
     public void loadList() {
-        List<String[]> list = new ArrayList<>();
+        list.clear();
 
         try {
             RequestSelectAsyncTask request = new RequestSelectAsyncTask();
-            request.execute(((MainActivity) getActivity()).getStudentLogin());
+            request.execute();
             ResultSet resultSet = request.get();
             if (resultSet != null) {
-                String type = null;
-                String status = null;
                 while (resultSet.next()) {
-                    switch (resultSet.getInt("TypeCertificateId")) {
-                        case 0:
-                            type = "Справка в пенсионный фонд";
-                            break;
-                        case 1:
-                            type = "Справка по месту требования";
-                            break;
-                        case 2:
-                            type = "Справка-вызов";
-                            break;
-                    }
-                    switch (resultSet.getInt("StatusId")) {
-                        case 0:
-                            status = "Отказано";
-                            break;
-                        case 1:
-                            status = "В обработке";
-                            break;
-                        case 2:
-                            status = "Готово";
-                            break;
-                    }
-
-                    list.add(new String[] {type, resultSet.getString("Id"), status, resultSet.getString("DateOrdering")});
+                    Ordering ordering = new Ordering();
+                    ordering.id = resultSet.getLong("Код");
+                    ordering.type = resultSet.getString("НазваниеТипа");
+                    ordering.count = resultSet.getInt("Количество");
+                    ordering.date = resultSet.getString("Дата");
+                    ordering.status = resultSet.getString("Статус");
+                    list.add(ordering);
                 }
             }
         } catch (Exception e) {
@@ -119,21 +105,24 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
         listView.setAdapter(adapter);
     }
 
-    private class RequestSelectAsyncTask extends AsyncTask<String, Void, ResultSet> {
+    private class RequestSelectAsyncTask extends AsyncTask<Void, Void, ResultSet> {
 
-        final static String MSSQL_STR_CONN = "jdbc:jtds:sqlserver://sql6007.site4now.net;database=DB_A48F50_Accel99;user=DB_A48F50_Accel99_admin;password=Foo5701478";
+        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
+        final static String USERNAME = "accel999";
+        final static String PASS = "Foo5701478";
 
         @Override
-        protected ResultSet doInBackground(String... studentId) {
+        protected ResultSet doInBackground(Void... voids) {
             Connection connection = null;
             Statement statement = null;
             ResultSet resultSet = null;
 
             try {
                 Class.forName("net.sourceforge.jtds.jdbc.Driver");
-                connection = DriverManager.getConnection(MSSQL_STR_CONN);
+
+                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
                 if (connection != null) {
-                    String query = "SELECT Id, TypeCertificateId, StatusId, DateOrdering FROM Ordering WHERE StudentId=" + studentId[0] + " ORDER BY Id DESC";
+                    String query = "SELECT ЗаказыСправок.Код, НазваниеТипа, Количество, Дата, Статус FROM ЗаказыСправок, ТипСправок, Статусы WHERE КодТипаСправки=ТипСправок.Код AND КодСтатуса=Статусы.Код AND КодСтудента=" + studentId + " ORDER BY ЗаказыСправок.Код DESC";
                     statement = connection.createStatement();
                     resultSet = statement.executeQuery(query);
                 }
@@ -145,5 +134,7 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
             return resultSet;
         }
     }
+
+
 
 }

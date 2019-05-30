@@ -14,8 +14,7 @@
         <TableLayout
             android:id="@+id/tlCurriculum"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#000">
+            android:layout_height="wrap_content">
 
         </TableLayout>
     </ScrollView>

@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,8 +22,8 @@ import java.sql.Statement;
  */
 public class OrderingChildFragment extends Fragment implements View.OnClickListener {
 
-    private int type;
-    private String studentId;
+    private int typeId;
+    private long studentId;
     private int count;
 
     RadioButton rb1;
@@ -39,8 +38,8 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
         rb2 = v.findViewById(R.id.rb2);
         rb3 = v.findViewById(R.id.rb3);
 
-        studentId = ((MainActivity)getActivity()).getStudentLogin();
-        type = getArguments().getInt("type");
+        studentId = ((MainActivity)getActivity()).getStudentId();
+        typeId = getArguments().getInt("type");
 
         Button btnOrder = v.findViewById(R.id.btnOrder);
         btnOrder.setOnClickListener(this);
@@ -70,7 +69,9 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
 
     private class RequestInsertAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        final static String MSSQL_STR_CONN = "jdbc:jtds:sqlserver://sql6007.site4now.net;database=DB_A48F50_Accel99;user=DB_A48F50_Accel99_admin;password=Foo5701478";
+        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
+        final static String USERNAME = "accel999";
+        final static String PASS = "Foo5701478";
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -80,9 +81,10 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
 
             try {
                 Class.forName("net.sourceforge.jtds.jdbc.Driver");
-                connection = DriverManager.getConnection(MSSQL_STR_CONN);
+
+                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
                 if (connection != null) {
-                    String query = "INSERT INTO Ordering (StudentId, TypeCertificateId, CountCertificates, StatusId) VALUES (" + studentId + ", " + type + ", " + count + ", 1)";
+                    String query = "INSERT INTO ЗаказыСправок (КодСтудента, КодТипаСправки, Количество, КодСтатуса) VALUES (" + studentId + ", " + typeId + ", " + count + ", 2)";
                     statement = connection.createStatement();
                     statement.execute(query);
                 }

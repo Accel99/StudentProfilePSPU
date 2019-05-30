@@ -2,6 +2,7 @@ package com.example.profile;
 
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -41,7 +42,6 @@ public class GradesFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_grades, container, false);
 
-        TableRow.LayoutParams paramsTr;
 
         tlGrades = v.findViewById(R.id.tlGrades);
 
@@ -54,14 +54,13 @@ public class GradesFragment extends Fragment {
 
                 TableRow row = new TableRow(getActivity());
                 row.setPadding(10, 20, 5, 10);
-                row.setBackgroundColor(Color.parseColor("#FFFFFF"));
 
                 TextView tv = new TextView(getActivity());
 
                 tv.setTextSize(20);
-                tv.setBackgroundColor(Color.parseColor("#FFFFFF"));
                 tv.setTextColor(Color.parseColor("#000000"));
-                tv.setText(semester + " cеместр ");
+                tv.setText(semester + " СЕМЕСТР ");
+                tv.setTypeface(null, Typeface.BOLD);
 
                 row.addView(tv);
 
@@ -69,34 +68,38 @@ public class GradesFragment extends Fragment {
             }
 
             TableRow row = new TableRow(getActivity());
+            row.setBackground(getResources().getDrawable(R.drawable.row_rounded));
+            TableLayout.LayoutParams paramsTl = new TableLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
+            paramsTl.setMargins(2,2,2,2);
+            row.setLayoutParams(paramsTl);
+
+            TableRow.LayoutParams paramsTr;
 
             TextView tv1 = new TextView(getActivity());
-            paramsTr = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.8f);
-            paramsTr.bottomMargin = 1;
-            paramsTr.leftMargin = 1;
-            paramsTr.rightMargin = 1;
-            paramsTr.topMargin = 1;
+            paramsTr = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.75f);
             tv1.setLayoutParams(paramsTr);
-            tv1.setBackgroundColor(Color.parseColor("#FFFFFF"));
             tv1.setGravity(Gravity.CENTER_VERTICAL);
-            tv1.setPadding(3, 10, 3, 10);
+            tv1.setPadding(7, 10, 7, 10);
+            tv1.setTextColor(Color.parseColor("#000000"));
             tv1.setTextSize(16);
             tv1.setText(grade.name);
 
+            View view = new View(getActivity());
+            view.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            TableRow.LayoutParams paramsV = new TableRow.LayoutParams(3, TableRow.LayoutParams.MATCH_PARENT);
+            view.setLayoutParams(paramsV);
+
             TextView tv2 = new TextView(getActivity());
-            paramsTr = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.2f);
-            paramsTr.bottomMargin = 1;
-            paramsTr.leftMargin = 1;
-            paramsTr.rightMargin = 1;
-            paramsTr.topMargin = 1;
+            paramsTr = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.25f);
             tv2.setLayoutParams(paramsTr);
-            tv2.setGravity(Gravity.CENTER_VERTICAL);
-            tv2.setPadding(3, 3, 3, 3);
+            tv2.setGravity(Gravity.CENTER);
+            tv2.setPadding(5, 3, 5, 3);
+            tv2.setTextColor(Color.parseColor("#000000"));
             tv2.setTextSize(16);
-            tv2.setBackgroundColor(Color.parseColor("#FFFFFF"));
             tv2.setText(grade.grade);
 
             row.addView(tv1);
+            row.addView(view);
             row.addView(tv2);
             row.setTag(grade);
 
@@ -125,25 +128,27 @@ public class GradesFragment extends Fragment {
 
         TableRow row1 = new TableRow(getActivity());
         row1.setTag(0);
-        row1.setBackgroundColor(Color.parseColor("#FFFFFF"));
+
         TextView tv1 = new TextView(getActivity());
         tv1.setGravity(Gravity.CENTER_VERTICAL);
         tv1.setPadding(20, 3, 3, 3);
         tv1.setTextSize(14);
-        tv1.setBackgroundColor(Color.parseColor("#FFFFFF"));
         tv1.setText("Дата выставления: " + grade.data);
+
         row1.addView(tv1);
+
         tlGrades.addView(row1, rowIndex + 1);
 
         TableRow row2 = new TableRow(getActivity());
-        row2.setBackgroundColor(Color.parseColor("#FFFFFF"));
+
         TextView tv2 = new TextView(getActivity());
         tv2.setGravity(Gravity.CENTER_VERTICAL);
         tv2.setPadding(20, 3, 3, 3);
         tv2.setTextSize(14);
-        tv2.setBackgroundColor(Color.parseColor("#FFFFFF"));
         tv2.setText("Преподаватель: " + grade.teacher);
+
         row2.addView(tv2);
+
         tlGrades.addView(row2, rowIndex + 2);
     }
 
@@ -180,7 +185,6 @@ public class GradesFragment extends Fragment {
     private class RequestSelectAsyncTask extends AsyncTask<Void, Void, ResultSet> {
 
         final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
-
         final static String USERNAME = "accel999";
         final static String PASS = "Foo5701478";
 
