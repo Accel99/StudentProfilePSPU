@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dbrequestclass;
 
 public class Ordering {
     public long id;

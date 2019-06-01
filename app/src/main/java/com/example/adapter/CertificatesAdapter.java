@@ -1,4 +1,4 @@
-package com.example;
+package com.example.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,16 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.dbrequestclass.Ordering;
 import com.example.profile.R;
 
 import java.util.List;
 
-public class MyAdapter extends ArrayAdapter {
+public class CertificatesAdapter extends ArrayAdapter {
 
     private List<Ordering> list;
     private Context context;
 
-    public MyAdapter(Context context, List<Ordering> objects) {
+    public CertificatesAdapter(Context context, List<Ordering> objects) {
         super(context, R.layout.list_item, objects);
 
         this.context = context;

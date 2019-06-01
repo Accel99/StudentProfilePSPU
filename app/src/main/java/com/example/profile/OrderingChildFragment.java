@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
 
+import com.example.dbrequestclass.RequestAsyncTask;
+import com.example.dbrequestclass.StudentInfo;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -23,12 +26,13 @@ import java.sql.Statement;
 public class OrderingChildFragment extends Fragment implements View.OnClickListener {
 
     private int typeId;
-    private long studentId;
+
+    private StudentInfo studentInfo;
     private int count;
 
-    RadioButton rb1;
-    RadioButton rb2;
-    RadioButton rb3;
+    private RadioButton rb1;
+    private RadioButton rb2;
+    private RadioButton rb3;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,7 +42,7 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
         rb2 = v.findViewById(R.id.rb2);
         rb3 = v.findViewById(R.id.rb3);
 
-        studentId = ((MainActivity)getActivity()).getStudentId();
+        studentInfo = ((MainActivity)getActivity()).getStudentInfo();
         typeId = getArguments().getInt("type");
 
         Button btnOrder = v.findViewById(R.id.btnOrder);
@@ -57,7 +61,9 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
             if (rb2.isChecked()) count = 2;
             if (rb3.isChecked()) count = 3;
 
-            RequestInsertAsyncTask request = new RequestInsertAsyncTask();
+            String query = "INSERT INTO ЗаказыСправок (КодСтудента, КодТипаСправки, Количество, КодСтатуса) VALUES (" + studentInfo.studentId + ", " + typeId + ", " + count + ", 2)";
+            RequestAsyncTask request = new RequestAsyncTask();
+            request.setQuery(query);
             request.execute();
             FragmentTransaction ft = getChildFragmentManager().beginTransaction();
             ft.hide(this);
@@ -67,33 +73,33 @@ public class OrderingChildFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    private class RequestInsertAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
-        final static String USERNAME = "accel999";
-        final static String PASS = "Foo5701478";
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Connection connection = null;
-            Statement statement = null;
-            ResultSet resultSet = null;
-
-            try {
-                Class.forName("net.sourceforge.jtds.jdbc.Driver");
-
-                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
-                if (connection != null) {
-                    String query = "INSERT INTO ЗаказыСправок (КодСтудента, КодТипаСправки, Количество, КодСтатуса) VALUES (" + studentId + ", " + typeId + ", " + count + ", 2)";
-                    statement = connection.createStatement();
-                    statement.execute(query);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-    }
+//    private class RequestInsertAsyncTask extends AsyncTask<Void, Void, Void> {
+//
+//        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
+//        final static String USERNAME = "accel999";
+//        final static String PASS = "Foo5701478";
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            Connection connection = null;
+//            Statement statement = null;
+//            ResultSet resultSet = null;
+//
+//            try {
+//                Class.forName("net.sourceforge.jtds.jdbc.Driver");
+//
+//                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
+//                if (connection != null) {
+//                    String query = "INSERT INTO ЗаказыСправок (КодСтудента, КодТипаСправки, Количество, КодСтатуса) VALUES (" + studentInfo.studentId + ", " + typeId + ", " + count + ", 2)";
+//                    statement = connection.createStatement();
+//                    statement.execute(query);
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            return null;
+//        }
+//    }
 }

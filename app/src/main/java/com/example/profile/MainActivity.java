@@ -3,6 +3,7 @@ package com.example.profile;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,32 +20,32 @@ import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dbrequestclass.RequestAsyncTask;
+import com.example.dbrequestclass.StudentInfo;
 import com.microsoft.identity.client.IAccount;
 import com.microsoft.identity.client.PublicClientApplication;
 
+import org.json.JSONObject;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int PERMISSION_STORAGE_CODE = 1000;
-    private boolean permissionStatus = false;
+//    private boolean permissionStatus = false;
 
-    private String studentName = "Анпилогов А. А.";
-    private long studentId = 1;
-    private String direction = "Фундаментальные информационные технологии";
-    private String faculty = "Математический";
-    private String group = "111";
+    private String studentIdAAD;
+    private StudentInfo studentInfo;
 
     PublicClientApplication sampleApp;
 
-    public String getFaculty() { return faculty; }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public long getStudentId() { return studentId; }
+    public StudentInfo getStudentInfo() { return studentInfo; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity
 
         //Проверка разрешений
         checkPermission();
+
+        fillStudentInfoFromDB(getIntent().getStringExtra("studentInfoStr"));
 
         //Тулбар
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -69,10 +72,10 @@ public class MainActivity extends AppCompatActivity
 
         //Установка данных студента в меню
         View header = navigationView.getHeaderView(0);
-        ((TextView)header.findViewById(R.id.tvStudentName)).setText(studentName);
-        ((TextView)header.findViewById(R.id.tvGroup)).setText("Группа: " + group);
-        ((TextView)header.findViewById(R.id.tvFaculty)).setText("Факультет: " + faculty);
-        ((TextView)header.findViewById(R.id.tvDirection)).setText(direction);
+        ((TextView)header.findViewById(R.id.tvStudentName)).setText(studentInfo.getFullName());
+        ((TextView)header.findViewById(R.id.tvGroup)).setText("Группа: " + studentInfo.group);
+        ((TextView)header.findViewById(R.id.tvFaculty)).setText("Факультет: " + studentInfo.faculty);
+        ((TextView)header.findViewById(R.id.tvDirection)).setText(studentInfo.getDirection());
 
         //Показ фрагмента главной страницы
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -81,6 +84,41 @@ public class MainActivity extends AppCompatActivity
         navigationView.setCheckedItem(R.id.amdHome);
 
         sampleApp = AuthActivity.getSampleApp();
+    }
+
+    private void fillStudentInfoFromDB(String studentJsonStr) {
+        try {
+            JSONObject studentJson = new JSONObject(studentJsonStr);
+            studentIdAAD = studentJson.getString("id");
+
+//            RequestSelectAsyncTask request = new RequestSelectAsyncTask();
+//            request.execute();
+//            ResultSet result = request.get();
+
+            String query = "SELECT Студенты.Код, Фамилия, Имя, Отчество, НазваниеГруппы, НазваниеСпециальности, НазваниеПрофиля, НазваниеФакультета, Группы.НомерПлана " +
+                    "FROM Студенты, Группы, Специальности, Факультеты " +
+                    "WHERE Студенты.КодГруппы=Группы.Код AND Группы.КодСпециальности=Специальности.Код AND Специальности.КодФакультета=Факультеты.Код AND Идентификатор='" + studentIdAAD + "'";
+            RequestAsyncTask request = new RequestAsyncTask();
+            request.setQuery(query);
+            request.execute();
+            ResultSet result = request.get();
+
+            studentInfo = new StudentInfo();
+            if (result != null) {
+                result.next();
+                studentInfo.studentId = result.getLong("Студенты.Код");
+                studentInfo.firstname = result.getString("Имя");
+                studentInfo.lastname = result.getString("Фамилия");
+                studentInfo.middlename = result.getString("Отчество");
+                studentInfo.group = result.getString("НазваниеГруппы");
+                studentInfo.faculty = result.getString("НазваниеФакультета");
+                studentInfo.specialty = result.getString("НазваниеСпециальности");
+                studentInfo.profileName = result.getString("НазваниеПрофиля");
+                studentInfo.planNum = result.getLong("Группы.НомерПлана");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Установка заголовка фрагментов
@@ -145,10 +183,10 @@ public class MainActivity extends AppCompatActivity
                 String[] permission = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
                 requestPermissions(permission, PERMISSION_STORAGE_CODE);
             } else {
-                permissionStatus = true;
+//                permissionStatus = true;
             }
         } else {
-            permissionStatus = true;
+//            permissionStatus = true;
         }
     }
 
@@ -158,10 +196,10 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case PERMISSION_STORAGE_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    permissionStatus = true;
+//                    permissionStatus = true;
                 } else {
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-                    permissionStatus = false;
+//                    permissionStatus = false;
                 }
         }
     }
@@ -177,10 +215,8 @@ public class MainActivity extends AppCompatActivity
         sampleApp.getAccounts(new PublicClientApplication.AccountsLoadedCallback() {
             @Override
             public void onAccountsLoaded(final List<IAccount> accounts) {
-
                 if (accounts.isEmpty()) {
                     /* No accounts to remove */
-
                 } else {
                     for (final IAccount account : accounts) {
                         sampleApp.removeAccount(
@@ -207,4 +243,36 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, AuthActivity.class);
         startActivity(intent);
     }
+
+//    private class RequestSelectAsyncTask extends AsyncTask<Void, Void, ResultSet> {
+//
+//        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
+//        final static String USERNAME = "accel999";
+//        final static String PASS = "Foo5701478";
+//
+//        @Override
+//        protected ResultSet doInBackground(Void... voids) {
+//            Connection connection = null;
+//            Statement statement = null;
+//            ResultSet resultSet = null;
+//
+//            try {
+//                Class.forName("com.mysql.jdbc.Driver").newInstance();
+//
+//                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
+//                if (connection != null) {
+//                    String query = "SELECT Студенты.Код, Фамилия, Имя, Отчество, НазваниеГруппы, НазваниеСпециальности, НазваниеПрофиля, НазваниеФакультета, Группы.НомерПлана " +
+//                            "FROM Студенты, Группы, Специальности, Факультеты " +
+//                            "WHERE Студенты.КодГруппы=Группы.Код AND Группы.КодСпециальности=Специальности.Код AND Специальности.КодФакультета=Факультеты.Код AND Идентификатор='" + studentIdAAD + "'";
+//                    statement = connection.createStatement();
+//                    resultSet = statement.executeQuery(query);
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            return resultSet;
+//        }
+//    }
 }

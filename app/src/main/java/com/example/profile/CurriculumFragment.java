@@ -3,30 +3,28 @@ package com.example.profile;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.dbrequestclass.PlanString;
+import com.example.dbrequestclass.RequestAsyncTask;
+import com.example.dbrequestclass.StudentInfo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -34,9 +32,9 @@ import java.util.concurrent.ExecutionException;
  */
 public class CurriculumFragment extends Fragment {
 
-    private int planNum = 1;
     private List<PlanString> list = new ArrayList<>();
     private TableLayout tlCurriculum;
+    private StudentInfo studentInfo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,6 +43,8 @@ public class CurriculumFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_curriculum, container, false);
 
         tlCurriculum = v.findViewById(R.id.tlCurriculum);
+
+        studentInfo = ((MainActivity)getActivity()).getStudentInfo();
 
         fillList();
 
@@ -93,7 +93,7 @@ public class CurriculumFragment extends Fragment {
             TextView tv2 = new TextView(getActivity());
             paramsTr = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 0.25f);
             tv2.setLayoutParams(paramsTr);
-            tv2.setGravity(Gravity.CENTER_VERTICAL);
+            tv2.setGravity(Gravity.CENTER);
             tv2.setPadding(5, 3, 5, 3);
             tv2.setTextSize(16);
             tv2.setTextColor(Color.parseColor("#000000"));
@@ -168,7 +168,9 @@ public class CurriculumFragment extends Fragment {
 
     private void fillList() {
         try {
-            RequestSelectAsyncTask request = new RequestSelectAsyncTask();
+            String query = "SELECT НазваниеДисциплины, ПоВыбору, Семестр, ТипОтчетности, КолЧасов, КолСамЧасов FROM СтрокиПланов, Дисциплины WHERE КодДисциплины=Дисциплины.Код AND НомерПлана=" + studentInfo.planNum + " ORDER BY Семестр";
+            RequestAsyncTask request = new RequestAsyncTask();
+            request.setQuery(query);
             request.execute();
             ResultSet result = request.get();
             if (result != null) {
@@ -183,50 +185,42 @@ public class CurriculumFragment extends Fragment {
                     ps.hIndCount = result.getInt("КолСамЧасов");
                     list.add(ps);
                 }
+            } else {
+                Toast.makeText(getActivity(), "Ошибка подключения", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private class RequestSelectAsyncTask extends AsyncTask<Void, Void, ResultSet> {
-
-        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
-
-        final static String USERNAME = "accel999";
-        final static String PASS = "Foo5701478";
-
-        @Override
-        protected ResultSet doInBackground(Void... voids) {
-            Connection connection = null;
-            Statement statement = null;
-            ResultSet resultSet = null;
-
-            try {
-                Class.forName("com.mysql.jdbc.Driver").newInstance();
-
-                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
-                if (connection != null) {
-                    String query = "SELECT НазваниеДисциплины, ПоВыбору, Семестр, ТипОтчетности, КолЧасов, КолСамЧасов FROM СтрокиПланов, Дисциплины WHERE КодДисциплины=Дисциплины.Код AND НомерПлана=" + planNum + " ORDER BY Семестр";
-                    statement = connection.createStatement();
-                    resultSet = statement.executeQuery(query);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return resultSet;
-        }
-    }
-
-    private class PlanString {
-        String name;
-        int optionaly;
-        int semester;
-        String type;
-        int hCount;
-        int hIndCount;
-    }
-
+//    private class RequestSelectAsyncTask extends AsyncTask<Void, Void, ResultSet> {
+//
+//        final static String MYSQL_STR_CONN = "jdbc:mysql://db4free.net:3306/pspudb2?useSSL=false&serverTimezone=UTC&autoReconnect=true&failOverReadOnly=false";
+//
+//        final static String USERNAME = "accel999";
+//        final static String PASS = "Foo5701478";
+//
+//        @Override
+//        protected ResultSet doInBackground(Void... voids) {
+//            Connection connection = null;
+//            Statement statement = null;
+//            ResultSet resultSet = null;
+//
+//            try {
+//                Class.forName("com.mysql.jdbc.Driver").newInstance();
+//
+//                connection = DriverManager.getConnection(MYSQL_STR_CONN, USERNAME, PASS);
+//                if (connection != null) {
+//                    String query = "SELECT НазваниеДисциплины, ПоВыбору, Семестр, ТипОтчетности, КолЧасов, КолСамЧасов FROM СтрокиПланов, Дисциплины WHERE КодДисциплины=Дисциплины.Код AND НомерПлана=" + studentInfo.planNum + " ORDER BY Семестр";
+//                    statement = connection.createStatement();
+//                    resultSet = statement.executeQuery(query);
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            return resultSet;
+//        }
+//    }
 }

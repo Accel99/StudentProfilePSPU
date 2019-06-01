@@ -13,12 +13,6 @@ import android.view.ViewGroup;
  */
 public class HomeFragment extends Fragment {
 
-
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((MainActivity)getActivity()).setActionBarTitle(getResources().getString(R.string.activity_main_drawer_home));

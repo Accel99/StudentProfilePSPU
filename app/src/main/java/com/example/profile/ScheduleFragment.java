@@ -11,18 +11,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.parse.PspuHtmlParser;
+import com.example.parser.PspuHtmlParser;
+import com.example.dbrequestclass.StudentInfo;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -31,9 +30,8 @@ import java.util.concurrent.ExecutionException;
 //Класс отображения расписания занятий
 public class ScheduleFragment extends Fragment {
 
-    PDFView pdfView;
-    String group;
-    String faculty;
+    private PDFView pdfView;
+    private StudentInfo studentInfo;
 
     //Идентификатор загрузки
     long downloadID;
@@ -58,9 +56,8 @@ public class ScheduleFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         pdfView = (PDFView) v.findViewById(R.id.pdfView);
+        studentInfo = ((MainActivity)getActivity()).getStudentInfo();
 
-        group = ((MainActivity)getActivity()).getGroup();
-        faculty = ((MainActivity)getActivity()).getFaculty();
 
         //Получение события об окончании загрузки
         getActivity().registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -70,7 +67,7 @@ public class ScheduleFragment extends Fragment {
         btnUpdPdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), group);
+                File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), studentInfo.group);
                 //Если файл существует
                 if (file.exists()) {
                     //Удалить
@@ -82,7 +79,7 @@ public class ScheduleFragment extends Fragment {
         });
 
         //Загрузка при открытии фрагмента
-        File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), group);
+        File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), studentInfo.group);
         //Если файла не существует
         if (!file.exists()) {
             //Скачать
@@ -110,30 +107,33 @@ public class ScheduleFragment extends Fragment {
             DownloadingAsyncTask downloadingAsyncTask = new DownloadingAsyncTask();
             downloadingAsyncTask.execute();
             url = downloadingAsyncTask.get();
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Toast.makeText(getActivity(), "Ошибка подключения", Toast.LENGTH_SHORT).show();
         }
         url = url.replace("edit#", "export?format=pdf&");
 
         //Настройка менеджера загрузок
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
-        request.setTitle("Download PDF");
-        request.setDescription("Downloading PDF file");
-        request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir("pspudir", group);
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
+            request.setTitle("Download PDF");
+            request.setDescription("Downloading PDF file");
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir("pspudir", studentInfo.group);
 
-        //Запуск менеджера загрузок
-        DownloadManager manager = (DownloadManager) ((MainActivity)getActivity()).getSystemService(Context.DOWNLOAD_SERVICE);
-        downloadID = manager.enqueue(request);
+            //Запуск менеджера загрузок
+            DownloadManager manager = (DownloadManager) ((MainActivity) getActivity()).getSystemService(Context.DOWNLOAD_SERVICE);
+            downloadID = manager.enqueue(request);
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Ошибка подключения", Toast.LENGTH_SHORT).show();
+        }
     }
 
     //Открытие PDF файла с расписанием группы
     private void openPdfDoc() {
-        File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), group);
+        File file = new File(new File(Environment.getExternalStorageDirectory(), "pspudir").getAbsolutePath(), studentInfo.group);
         pdfView.fromFile(file).load();
     }
 
@@ -142,7 +142,7 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected String doInBackground(Void... voids) {
-            String url = PspuHtmlParser.getDocScheduleGroupUrl(faculty, group);
+            String url = PspuHtmlParser.getDocScheduleGroupUrl(studentInfo.faculty, studentInfo.group);
             return url;
         }
     }
