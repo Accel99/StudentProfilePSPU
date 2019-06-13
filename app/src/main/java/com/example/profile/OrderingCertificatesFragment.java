@@ -4,7 +4,9 @@ package com.example.profile;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,25 +62,38 @@ public class OrderingCertificatesFragment extends Fragment implements View.OnCli
     @Override
     public void onClick(View v) {
         int id = v.getId();
-
-        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-        OrderingChildFragment fragment = new OrderingChildFragment();
+        FragmentManager fm = getChildFragmentManager();
         Bundle bundle = new Bundle();
         if (id == R.id.btnPlace) {
-            bundle.putInt("type", 2);
-            fragment.setArguments(bundle);
-            ft.replace(R.id.flOrderingPlace, fragment);
-            ft.commit();
+            OrderingChildFragment fragment = (OrderingChildFragment) fm.findFragmentByTag("Place");
+            if (fragment != null && fragment.isVisible()) {
+                fm.beginTransaction().hide(fragment).commit();
+            } else {
+                fragment = new OrderingChildFragment();
+                bundle.putInt("type", 2);
+                fragment.setArguments(bundle);
+                fm.beginTransaction().replace(R.id.flOrderingPlace, fragment, "Place").commit();
+            }
         } else if (id == R.id.btnPension) {
-            bundle.putInt("type", 1);
-            fragment.setArguments(bundle);
-            ft.replace(R.id.flOrderingPension, fragment);
-            ft.commit();
+            OrderingChildFragment fragment = (OrderingChildFragment) fm.findFragmentByTag("Pension");
+            if (fragment != null && fragment.isVisible()) {
+                fm.beginTransaction().hide(fragment).commit();
+            } else {
+                fragment = new OrderingChildFragment();
+                bundle.putInt("type", 1);
+                fragment.setArguments(bundle);
+                fm.beginTransaction().replace(R.id.flOrderingPension, fragment, "Pension").commit();
+            }
         } else if (id == R.id.btnCall) {
-            bundle.putInt("type", 3);
-            fragment.setArguments(bundle);
-            ft.replace(R.id.flOrderingCall, fragment);
-            ft.commit();
+            OrderingChildFragment fragment = (OrderingChildFragment) fm.findFragmentByTag("Call");
+            if (fragment != null && fragment.isVisible()) {
+                fm.beginTransaction().hide(fragment).commit();
+            } else {
+                fragment = new OrderingChildFragment();
+                bundle.putInt("type", 3);
+                fragment.setArguments(bundle);
+                fm.beginTransaction().replace(R.id.flOrderingCall, fragment, "Call").commit();
+            }
         }
     }
 

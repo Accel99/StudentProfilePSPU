@@ -25,7 +25,7 @@ public class AuthActivity extends AppCompatActivity {
     final static String MSGRAPH_URL = "https://graph.microsoft.com/v1.0/me";
 
     /* UI & Debugging Variables */
-    private static final String TAG = /*AuthActivity.class.getSimpleName();*/ "AUTH_MS";
+    private static final String TAG = "AUTH_MS";
 
     private TextView tvAuthRefresh;
     private TextView tvAuthError;

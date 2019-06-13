@@ -57,11 +57,23 @@ public class CurriculumFragment extends Fragment {
                 row.setPadding(10, 20, 5, 10);
 
                 TextView tv = new TextView(getActivity());
-
                 tv.setTextSize(20);
                 tv.setTextColor(Color.parseColor("#000000"));
                 tv.setText(semester + " СЕМЕСТР ");
                 tv.setTypeface(null, Typeface.BOLD);
+
+                row.addView(tv);
+
+                tlCurriculum.addView(row);
+            }
+
+            if  (ps.optionaly != 0) {
+                TableRow row = new TableRow(getActivity());
+                row.setPadding(10, 10, 5, 5);
+
+                TextView tv = new TextView(getActivity());
+                tv.setTextColor(Color.parseColor("#000000"));
+                tv.setText("Дисциплина по выбору " + ps.optionaly);
 
                 row.addView(tv);
 
@@ -168,7 +180,7 @@ public class CurriculumFragment extends Fragment {
 
     private void fillList() {
         try {
-            String query = "SELECT НазваниеДисциплины, ПоВыбору, Семестр, ТипОтчетности, КолЧасов, КолСамЧасов FROM СтрокиПланов, Дисциплины WHERE КодДисциплины=Дисциплины.Код AND НомерПлана=" + studentInfo.planNum + " ORDER BY Семестр";
+            String query = "SELECT НазваниеДисциплины, ПоВыбору, Семестр, ТипОтчетности, КолЧасов, КолСамЧасов FROM СтрокиПланов, Дисциплины WHERE КодДисциплины=Дисциплины.Код AND НомерПлана=" + studentInfo.planNum + " ORDER BY Семестр, ПоВыбору";
             RequestAsyncTask request = new RequestAsyncTask();
             request.setQuery(query);
             request.execute();
